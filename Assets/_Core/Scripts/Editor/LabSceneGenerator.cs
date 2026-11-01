@@ -10,6 +10,7 @@ public static class LabSceneGenerator
 {
     private static readonly string[] SceneNames = BuildSceneNames();
 
+    [MenuItem("Tools/Virtual Physical Lab/Generate Lab Scenes")]
     public static void GenerateAllScenes()
     {
         Directory.CreateDirectory("Assets/Scenes");
