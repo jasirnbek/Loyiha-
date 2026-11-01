@@ -11,42 +11,67 @@ namespace VirtualPhysicalLab.Laboratories.Lab02
         [SerializeField] private float distanceS = 1.2f;
         [SerializeField] private float accelerationA = 0.5f;
 
-        private float elapsedTime = 0f;
-        private bool isRolling = false;
+        private float elapsedTime;
+        private bool isRolling;
+        private Coroutine rollRoutine;
 
         public delegate void BallReachedEnd(float finalTime);
         public event BallReachedEnd OnBallReachedEnd;
 
         public void StartSimulation()
         {
-            ballTransform.position = startPoint.position;
+            if (ballTransform == null || startPoint == null || endPoint == null)
+            {
+                Debug.LogError("Galiley tajribasi uchun ball, start va end nuqtalari Inspector'da biriktirilishi kerak.", this);
+                return;
+            }
+            if (distanceS <= 0f || accelerationA <= 0f)
+            {
+                Debug.LogError("Masofa va tezlanish noldan katta bo'lishi kerak.", this);
+                return;
+            }
+
+            StopSimulation();
             elapsedTime = 0f;
+            ballTransform.position = startPoint.position;
             isRolling = true;
-            StartCoroutine(RollBallRoutine());
+            rollRoutine = StartCoroutine(RollBallRoutine());
+        }
+
+        public void StopSimulation()
+        {
+            isRolling = false;
+            if (rollRoutine != null)
+            {
+                StopCoroutine(rollRoutine);
+                rollRoutine = null;
+            }
         }
 
         private IEnumerator RollBallRoutine()
         {
             Vector3 startPos = startPoint.position;
             Vector3 endPos = endPoint.position;
+
             while (isRolling)
             {
                 elapsedTime += Time.deltaTime;
-                float currentDistance = 0.5f * accelerationA * Mathf.Pow(elapsedTime, 2);
-                float progress = currentDistance / distanceS;
-                if (progress >= 1.0f)
+                float currentDistance = 0.5f * accelerationA * elapsedTime * elapsedTime;
+                float progress = Mathf.Clamp01(currentDistance / distanceS);
+                ballTransform.position = Vector3.Lerp(startPos, endPos, progress);
+
+                if (progress >= 1f)
                 {
-                    progress = 1.0f;
                     isRolling = false;
-                    ballTransform.position = endPos;
+                    rollRoutine = null;
                     OnBallReachedEnd?.Invoke(elapsedTime);
-                }
-                else
-                {
-                    ballTransform.position = Vector3.Lerp(startPos, endPos, progress);
+                    yield break;
                 }
                 yield return null;
             }
+            rollRoutine = null;
         }
+
+        private void OnDisable() => StopSimulation();
     }
 }
