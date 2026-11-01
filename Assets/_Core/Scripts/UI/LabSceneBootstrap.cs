@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace VirtualPhysicalLab.Core.UI
 {
@@ -36,6 +37,12 @@ namespace VirtualPhysicalLab.Core.UI
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1080, 1920);
             scaler.matchWidthOrHeight = 0.5f;
+
+            if (FindObjectOfType<EventSystem>() == null)
+            {
+                var eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+                DontDestroyOnLoad(eventSystem);
+            }
 
             var panel = CreatePanel(canvasObject.transform, new Vector2(0.5f, 0.5f), new Vector2(0.9f, 0.88f));
             if (SceneManager.GetActiveScene().name == "MainMenu")
