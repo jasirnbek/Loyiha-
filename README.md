@@ -18,7 +18,7 @@ Loyihada 21 ta laboratoriya uchun fizik hisoblash skriptlari, umumiy o'lchov va 
 
 - WebGL: Unity Build Settings'da WebGL platformasini tanlang.
 - Android: Android Build Support, SDK, NDK va OpenJDK o'rnatilgan bo'lishi kerak.
-- GitHub Actions uchun repository secret sifatida UNITY_LICENSE talab qilinadi.
+- GitHub Actions uchun repository secrets: UNITY_LICENSE, UNITY_EMAIL va UNITY_PASSWORD talab qilinadi. Ularni hech qachon kodga yozmang yoki chatga yubormang.
 - CI WebGL va Android uchun alohida build ishlarini bajaradi va natijalarni artifact sifatida saqlaydi.
 
 ## Tuzatishlar
@@ -40,4 +40,4 @@ PDFReportGenerator nomiga qaramay haqiqiy PDF fayl yaratmaydi; hozircha HTML his
 
 ## GitHub CI
 
-GitHub Actions build jarayonlari uchun UNITY_LICENSE secret to'g'ri sozlangan bo'lishi kerak. Agar CI litsenziya faollashtirish bosqichida to'xtasa, Unity Personal/Pro litsenziyasiga mos Unity license faylini GitHub Actions secret sifatida kiriting.
+GitHub Actions loglari UNITY_LICENSE mavjudligini, ammo UNITY_EMAIL va UNITY_PASSWORD secretlari yo'qligini ko'rsatdi. Shu sababli build Unity ishga tushishidan oldin to'xtaydi. Repository Settings → Secrets and variables → Actions bo'limida quyidagilarni yarating: UNITY_LICENSE (Unity .ulf faylining to'liq matni), UNITY_EMAIL (Unity hisobingiz emaili), UNITY_PASSWORD (Unity hisobingiz paroli). Bu ma'lumotlarni repozitoriy fayllariga yozmang va hech kimga yubormang. GameCI yo'riqnomasi: https://game.ci/docs/github/activation/.
