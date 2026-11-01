@@ -1,58 +1,69 @@
-name: Unity Build Pipeline 🚀
+name: Unity Build Pipeline
 
 on:
   push:
-    branches:
-      - main  # Kod main branchiga push qilinganda ishlaydi
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: unity-build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  buildAllPlatforms:
-    name: Build for WebGL & Android 🛠️
+  build-webgl:
+    name: Build WebGL
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
-      # 1. GitHub-dagi kodni yuklab olish
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           lfs: true
-
-      # 2. Unity keshini tekshirish (Tezroq build bo'lishi uchun)
-      - name: Cache Library folder
-        uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: Library
-          key: Library-Unity-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}
-          restore-keys: |
-            Library-Unity-
-
-      # 3. WebGL Build qilish
-      - name: Build WebGL Platform 🌐
+          key: Library-WebGL-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**/*.meta') }}
+          restore-keys: Library-WebGL-
+      - name: Build WebGL
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           targetPlatform: WebGL
           buildMethod: UnityBuilder.BuildProject
-
-      # 4. WebGL natijasini saqlash (Artifact)
-      - name: Upload WebGL Build Artifact
-        uses: actions/upload-artifact@v4
+          customParameters: -buildTarget WebGL
+      - uses: actions/upload-artifact@v4
+        if: success()
         with:
-          name: Build-WebGL
+          name: VirtualPhysicalLab-WebGL
           path: build/WebGL
+          if-no-files-found: error
 
-      # 5. Android Build qilish
-      - name: Build Android Platform 📱
+  build-android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Android-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**/*.meta') }}
+          restore-keys: Library-Android-
+      - name: Build Android
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           targetPlatform: Android
           buildMethod: UnityBuilder.BuildProject
-
-      # 6. Android (.apk) natijasini saqlash
-      - name: Upload Android Build Artifact
-        uses: actions/upload-artifact@v4
+          customParameters: -buildTarget Android
+      - uses: actions/upload-artifact@v4
+        if: success()
         with:
-          name: Build-Android
-          path: build/Android
+          name: VirtualPhysicalLab-Android
+          path: build/Android/*.apk
+          if-no-files-found: error
