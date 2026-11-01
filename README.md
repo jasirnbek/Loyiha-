@@ -1,36 +1,43 @@
 # Virtual Physical Lab
 
-Unity 2022.3.20f1 asosidagi virtual fizika laboratoriyalari loyihasi.
+Unity 2022.3.20f1 asosidagi virtual fizika laboratoriyalari prototipi.
 
-## Holati
+## Hozirgi holati
 
-Loyiha hozircha ishlab chiqish bosqichidagi Unity prototipi. Repozitoriyda 21 ta laboratoriya yo'nalishi uchun kodlar va umumiy hisobot modullari mavjud. To'liq tayyor mahsulot deb hisoblashdan oldin Unity Editor'da sahnalar, Inspector bog'lanishlari, paketlar va platforma build'lari tekshirilishi shart.
+Loyihada 21 ta laboratoriya uchun fizik hisoblash skriptlari, umumiy o'lchov va hisobot modullari mavjud. Unity Editor build jarayonida avtomatik ravishda bosh menyu va 21 ta laboratoriya sahnasini yaratadi.
 
-## Texnik tuzatishlar
+## Unity loyihasini ochish
 
-- Assets/_Core va Assets/Assets/_Core ichidagi takroriy Core sinflari olib tashlandi; bu bir xil namespace/type nomlari sababli C# kolliziyalarini bartaraf etadi.
-- Fizik hisob-kitoblarda null, nol, manfiy, NaN va Infinity holatlari tekshiriladi.
-- Galiley tajribasida qayta ishga tushirish oldingi coroutine'ni to'xtatadi.
-- HTML hisobotida foydalanuvchi matni HTML-escape qilinadi; eksport hozircha PDF emas, chop etishga mos HTML.
-- CSV maydonlari escape qilinadi va spreadsheet formula injection xavfi kamaytiriladi.
-- Hisobotlarni saqlash va o'qishdagi xatolar yaxshiroq boshqariladi.
-- CI WebGL va Android build'larini PR, main push va qo'lda ishga tushirish uchun sozlangan.
+1. Unity Hub orqali Unity 2022.3.20f1 versiyasini o'rnating.
+2. Repozitoriy ildizidagi papkani Unity Hub orqali oching.
+3. Unity birinchi marta ochilganda Package Manager Packages/manifest.json dagi TextMeshPro va UGUI paketlarini yuklab olishini kuting.
+4. Tools → Virtual Physical Lab → Generate Lab Scenes menyusidan sahnalarni yaratish (yoki build pipeline orqali avtomatik yaratish) mumkin.
+5. Assets/Scenes/MainMenu.unity sahnasini ochib Play tugmasini bosing.
 
-## Ishga tushirish
+## Build
 
-1. Unity Hub orqali Unity 2022.3.20f1 o'rnating.
-2. Repozitoriyni Unity Hub'dan oching.
-3. Console oynasidagi compile xatolarini tuzating.
-4. Har bir laboratoriya uchun .unity sahna yarating va kerakli GameObject/Inspector referenslarini ulang.
-5. File > Build Settings orqali sahnalarni qo'shing.
-6. WebGL yoki Android platformasini tanlab build qiling.
+- WebGL: Unity Build Settings'da WebGL platformasini tanlang.
+- Android: Android Build Support, SDK, NDK va OpenJDK o'rnatilgan bo'lishi kerak.
+- GitHub Actions uchun repository secret sifatida UNITY_LICENSE talab qilinadi.
+- CI WebGL va Android uchun alohida build ishlarini bajaradi va natijalarni artifact sifatida saqlaydi.
 
-## CI talablari
+## Tuzatishlar
 
-GitHub Actions uchun repository Secrets ichida UNITY_LICENSE kerak. Android build uchun Unity o'rnatmasida Android Build Support, SDK, NDK va OpenJDK bo'lishi kerak.
+- Core fizik hisoblashlarda noto'g'ri, cheksiz va nolga teng qiymatlar tekshiriladi.
+- Galiley simulyatsiyasida qayta boshlashdan oldingi coroutine to'xtatiladi.
+- Hisobot HTML'ida foydalanuvchi kiritgan matn HTML-escape qilinadi. Eslatma: bu PDF emas, chop etishga mos HTML.
+- CSV eksportida maydonlarni escape qilish va spreadsheet formula injection himoyasi mavjud.
+- Hisobotlarni saqlash/o'qishdagi xatolar boshqariladi.
+- DOTween tashqi bog'liqligi olib tashlandi; UI animatsiyalari Unity coroutine orqali bajariladi.
+- TextMeshPro va UGUI paketlari manifestda aniq ko'rsatilgan.
+- Unity build'dan oldin bosh menyu va 21 ta boshlang'ich sahna avtomatik generatsiya qilinadi.
 
-## Hozirgi cheklovlar
+## Muhim cheklovlar
 
-- Repozitoriyda .unity sahnalari va Unity .meta GUID fayllari yetarli emas; kodlar kompilyatsiya qilinsa ham tayyor interaktiv laboratoriya UI avtomatik hosil bo'lmaydi.
-- PDFReportGenerator hozircha chop etishga mos HTML yaratadi, PDF binary fayl emas.
-- Unity Editor build/test muhiti bu o'zgarishlar davomida ishga tushirilmagan. GitHub Actions natijasi bilan tasdiqlanmaguncha build muvaffaqiyatli deb hisoblanmaydi.
+Avtomatik yaratiladigan laboratoriya sahnalari hozircha navigatsiya va interfeys karkasidir. Har bir tajriba uchun 3D qurilmalar, Inspector bog'lanishlari, real o'lchov boshqaruvlari va fizik skriptlar bilan to'liq integratsiya hali bajarilishi kerak. Ayrim fizik formulalar alohida skriptlarda mavjud, ammo ular barcha sahnalarga avtomatik ulanmagan.
+
+PDFReportGenerator nomiga qaramay haqiqiy PDF fayl yaratmaydi; hozircha HTML hisobot yaratadi. Unity Editor build muvaffaqiyatli o'tmaguncha tayyor APK/WebGL mahsuloti deb hisoblamang.
+
+## GitHub CI
+
+GitHub Actions build jarayonlari uchun UNITY_LICENSE secret to'g'ri sozlangan bo'lishi kerak. Agar CI litsenziya faollashtirish bosqichida to'xtasa, Unity Personal/Pro litsenziyasiga mos Unity license faylini GitHub Actions secret sifatida kiriting.
