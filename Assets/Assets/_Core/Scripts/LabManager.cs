@@ -7,43 +7,43 @@ namespace VirtualPhysicalLab.Core
     public class LabManager : MonoBehaviour
     {
         public static LabManager Instance { get; private set; }
-
-        [Header("Xizmatlar")]
         [SerializeField] private PDFReportGenerator pdfGenerator;
         private ReportStorageService storageService;
 
         private void Awake()
         {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-                storageService = new ReportStorageService();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            storageService = new ReportStorageService();
         }
 
-        public void FinalizeLabReport(int labId, string student, string group, double result, double absError, double relError)
+        public void FinalizeLabReport(int labId, string student, string group,
+            double result, double absError, double relError)
         {
-            LabReport report = new LabReport
+            if (storageService == null) storageService = new ReportStorageService();
+            var report = new LabReport
             {
-                id = Guid.NewGuid().ToString(),
+                id = Guid.NewGuid().ToString("N"),
                 labId = labId,
-                studentName = student,
-                groupName = group,
+                studentName = student ?? string.Empty,
+                groupName = group ?? string.Empty,
                 timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 finalResult = result,
                 absoluteError = absError,
                 relativeError = relError,
-                isPassed = relError < 10.0
+                isPassed = !double.IsNaN(relError) && !double.IsInfinity(relError) && relError >= 0d && relError < 10d
             };
 
-            storageService.SaveReport(report);
-            pdfGenerator.GeneratePDFReport(report);
-            Debug.Log($"Laboratoriya {labId} muvaffaqiyatli topshirildi va hisobot yaratildi!");
+            string savedPath = storageService.SaveReport(report);
+            if (pdfGenerator != null) pdfGenerator.GeneratePDFReport(report);
+            else Debug.LogWarning("PDFReportGenerator biriktirilmagan. JSON hisobot saqlandi: " + savedPath, this);
+            Debug.Log($"Laboratoriya {labId} hisoboti saqlandi: {savedPath}", this);
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
     }
 }
