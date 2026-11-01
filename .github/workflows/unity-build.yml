@@ -25,11 +25,21 @@ jobs:
           path: Library
           key: Library-WebGL-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**/*.meta') }}
           restore-keys: Library-WebGL-
+      - name: Validate Unity license secret
+        shell: bash
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        run: |
+          if [ -z "$UNITY_LICENSE" ]; then
+            echo "::error::Repository secret UNITY_LICENSE is missing. Add a valid Unity license before running CI."
+            exit 1
+          fi
       - name: Build WebGL
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
+          unityVersion: 2022.3.20f1
           targetPlatform: WebGL
           buildMethod: UnityBuilder.BuildProject
           customParameters: -buildTarget WebGL
@@ -53,11 +63,21 @@ jobs:
           path: Library
           key: Library-Android-${{ hashFiles('ProjectSettings/ProjectVersion.txt') }}-${{ hashFiles('Assets/**/*.meta') }}
           restore-keys: Library-Android-
+      - name: Validate Unity license secret
+        shell: bash
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        run: |
+          if [ -z "$UNITY_LICENSE" ]; then
+            echo "::error::Repository secret UNITY_LICENSE is missing. Add a valid Unity license before running CI."
+            exit 1
+          fi
       - name: Build Android
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
+          unityVersion: 2022.3.20f1
           targetPlatform: Android
           buildMethod: UnityBuilder.BuildProject
           customParameters: -buildTarget Android
